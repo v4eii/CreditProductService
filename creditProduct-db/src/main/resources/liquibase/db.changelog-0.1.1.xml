@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+    <changeSet id="15823" author="autor">
+        <sql>
+            INSERT INTO credit_product (product_name, min_term, max_term, min_price, max_price, percent, type) VALUES ('Продукт1', 80, 120, 600000, 1500000, 9.4, 'DIFF'), ('Продукт2', 150, 200, 1500000, 3000000, 11.6, 'ANNUITY');
+            INSERT INTO accounts (login, password, user_name, role) VALUES ('nts', 'nts', 'Katar', 'CREDIT_MANAGER'), ('admin', 'admin', 'Admin', 'SUPERVISOR');
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
