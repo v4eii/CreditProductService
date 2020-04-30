@@ -1,0 +1,36 @@
+spring:
+  kafka:
+    consumer:
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: 15sl02tt
+    url: jdbc:postgresql://localhost:5432/postgres
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+    hibernate:
+      ddl-auto: update
+  cloud:
+    stream:
+      bindings:
+        output:
+          destination: credit
+        input:
+          destination: result
+          group: app.1
+      kafka:
+        binder:
+          brokers: localhost:9092
+          configuration:
+            key.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            key.deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+            value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            value.deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      default-binder: kafka
+server:
+  port: 8081

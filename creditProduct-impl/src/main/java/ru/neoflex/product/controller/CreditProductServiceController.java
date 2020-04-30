@@ -1,27 +1,33 @@
 package ru.neoflex.product.controller;
 
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
-import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import payments.schema.Credit;
+import payments.schema.Payment;
 import ru.neoflex.product.entity.CreditProduct;
+import ru.neoflex.product.messaging.ApplicationSink;
 import ru.neoflex.product.service.CreditProductServiceImpl;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 @RestController
+@EnableBinding(ApplicationSink.class)
 public class CreditProductServiceController {
 
     private static final Logger LOG = LoggerFactory.getLogger(CreditProductServiceController.class);
@@ -30,7 +36,7 @@ public class CreditProductServiceController {
     private CreditProductServiceImpl creditProductService;
 
     @Autowired
-    private KafkaTemplate<Long, Credit> kafkaTemplate;
+    private ApplicationSink sink;
 
     @RequestMapping(method = RequestMethod.POST, path = "/findProduct")
     public CreditProduct getSuitableProduct(
@@ -49,9 +55,8 @@ public class CreditProductServiceController {
                     c.setTerm(suitableCreditProduct.get(0).getMinTerm());
                     c.setType(suitableCreditProduct.get(0).getType());
 
-                    ListenableFuture<SendResult<Long, Credit>> future = kafkaTemplate.send("credit", c.getId(), c);
-                    future.addCallback(System.out::println, System.err::println);
-                    kafkaTemplate.flush();
+                    Message<Credit> msg = MessageBuilder.withPayload(c).setHeader(KafkaHeaders.MESSAGE_KEY, c.getType()).build();
+                    sink.output().send(msg);
                 }
                 catch (DatatypeConfigurationException e) {
                     LOG.error(e.getMessage(), e);
@@ -62,15 +67,9 @@ public class CreditProductServiceController {
         return null;
     }
 
-    // Не знаю почему передаваемый List<Payment> при сериализации и десериализации преобразуется в List<LinkedHashMap>
-    @KafkaListener(topics = "resultList")
-    public void msgListener(ConsumerRecord<Long, List<LinkedHashMap>> record) {
-        List<LinkedHashMap> value = record.value();
-        for (LinkedHashMap val : value) {
-            System.out.println("#");
-            System.out.println(val.get("paymentForBody"));
-            System.out.println(val.get("paymentForPercent"));
-        }
+    @StreamListener(target = ApplicationSink.INPUT)
+    public void on(@Payload List<Payment> paymentList) {
+        System.out.println(paymentList.size());
     }
 
 }

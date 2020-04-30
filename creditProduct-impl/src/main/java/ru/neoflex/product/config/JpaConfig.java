@@ -22,17 +22,17 @@ import java.util.Properties;
 @EnableJpaRepositories(basePackageClasses = ProductApplication.class)
 public class JpaConfig implements TransactionManagementConfigurer {
 
-    @Value("${dataSource.driverClassName}")
+    @Value("${spring.datasource.driver-class-name}")
     private String driver;
-    @Value("${dataSource.url}")
+    @Value("${spring.datasource.url}")
     private String url;
-    @Value("${dataSource.username}")
+    @Value("${spring.datasource.username}")
     private String username;
-    @Value("${dataSource.password}")
+    @Value("${spring.datasource.password}")
     private String password;
-    @Value("${hibernate.dialect}")
+    @Value("${spring.jpa.database-platform}")
     private String dialect;
-    @Value("${hibernate.hbm2ddl.auto}")
+    @Value("${spring.jpa.hibernate.ddl-auto}")
     private String hbm2ddlAuto;
 
 
