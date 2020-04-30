@@ -1,6 +1,5 @@
 package ru.neoflex.product.controller;
 
-import com.sun.net.httpserver.Headers;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,17 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import payments.schema.Credit;
-import payments.schema.Payment;
 import ru.neoflex.product.entity.CreditProduct;
-import ru.neoflex.product.entity.Payments;
 import ru.neoflex.product.service.CreditProductServiceImpl;
 
 import javax.xml.datatype.DatatypeConfigurationException;
